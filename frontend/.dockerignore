@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+.vscode/
+.idea/
+.DS_Store
+
+# Env-файлы не копируем в образ (передаются через docker-compose)
+.env*

@@ -1,0 +1,121 @@
+# ============================================================================
+# Task Board — docker compose
+# Сервисы: proxy (Caddy), backend (FastAPI + aiogram), frontend (Next.js).
+# См. ARCHITECTURE.md §7. Версии зафиксированы (VISION §13 / план этапа 1).
+# ============================================================================
+#
+# Запуск:
+#   cp .env.example .env  &&  отредактировать .env
+#   docker compose up -d --build
+#
+# Логи:
+#   docker compose logs -f backend
+#
+# Health:
+#   curl -k https://localhost/healthz   # liveness (DOMAIN=localhost → только HTTPS, внутренний CA)
+#   curl -k https://localhost/ready     # readiness (vault + sqlite)
+
+name: taskboard
+
+networks:
+  taskboard-net:
+    driver: bridge
+
+# Именованные volumes (кроме монтируемого ./vault).
+volumes:
+  caddy_data:        # TLS-сертификаты и состояние Caddy
+  caddy_config:
+
+services:
+  # --------------------------------------------------------------------------
+  # Backend: FastAPI + aiogram-бот (один контейнер, Q-A1).
+  # --------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: taskboard-backend:latest
+    container_name: taskboard-backend
+    restart: unless-stopped
+    # Файлы vault принадлежат пользователю хоста (UID/GID из .env) —
+    # контейнер пишет от того же пользователя, чтобы Syncthing на хосте
+    # мог перезаписывать созданные бэкендом .md без Permission denied.
+    user: "${UID:-1000}:${GID:-1000}"
+    env_file:
+      - .env
+    environment:
+      # Явные переопределения для контейнера (на случай отсутствия в .env).
+      - APP_ENV=${APP_ENV:-development}
+      - VAULT_PATH=/app/vault
+      - DB_PATH=/app/vault/.taskboard/index.sqlite
+    volumes:
+      # Vault — источник правды (см. ARCHITECTURE §4, DATA_MODEL §1).
+      # SQLite-индекс живёт ВНУТРИ vault/.taskboard/ (DATA_MODEL §3),
+      # поэтому отдельный volume не нужен — индекс rides на vault-маунте.
+      - ./vault:/app/vault
+    networks:
+      - taskboard-net
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://localhost:8000/healthz', timeout=3); sys.exit(0)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # --------------------------------------------------------------------------
+  # Frontend: Next.js (веб + Telegram Mini App). Один кодбейз (Q-A1, §3.2).
+  # --------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # NEXT_PUBLIC_* инлайнятся в клиентский бандл ПРИ СБОРКЕ (npm run build) —
+      # runtime environment их уже не переопределит. Менять — только через
+      # build args + пересборка.
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-/api/v1}
+    image: taskboard-frontend:latest
+    container_name: taskboard-frontend
+    restart: unless-stopped
+    # Никаких секретов: env_file НЕ подключаем — фронтенду нужен только API-URL.
+    environment:
+      - NODE_ENV=production
+    networks:
+      - taskboard-net
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # --------------------------------------------------------------------------
+  # Proxy: Caddy (TLS auto, реверс-прокси, CORS/CSP для TMA).
+  # --------------------------------------------------------------------------
+  proxy:
+    image: caddy:2.8-alpine
+    container_name: taskboard-proxy
+    restart: unless-stopped
+    # Никаких секретов: env_file НЕ подключаем — Caddy нужны только домен и HSTS.
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+      - HSTS_MAX_AGE=${HSTS_MAX_AGE:-31536000}
+    volumes:
+      - ./proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data          # TLS-сертификаты и состояние Caddy
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - taskboard-net
+    depends_on:
+      - backend
+      - frontend

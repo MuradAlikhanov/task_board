@@ -1,0 +1,67 @@
+# === Environment & secrets ===
+.env
+.env.*
+!.env.example
+
+# === Vault runtime data (синхронизируется через Syncthing, не в git) ===
+# config.yml — хранится в git (дефолтная схема); остальной контент vault — нет
+vault/tasks/*
+!vault/tasks/.gitkeep
+vault/archive/*
+!vault/archive/.gitkeep
+vault/attachments/*
+!vault/attachments/.gitkeep
+# Подкаталоги wiki/ не игнорируем целиком: git не может вернуть файл (.gitkeep)
+# из исключённого каталога — игнорируем их содержимое, кроме .gitkeep.
+vault/wiki/*
+!vault/wiki/*/
+vault/wiki/*/*
+!vault/wiki/*/.gitkeep
+vault/.taskboard/index.sqlite
+vault/.taskboard/index.sqlite-*
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+.deps/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# === Node / Next.js ===
+node_modules/
+.next/
+out/
+build/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# === IDE / OS / AI ===
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.zcode/
+
+# === Syncthing ===
+.syncthing*
+*.sync-conflict*
+
+# === Obsidian (если vault открывается локально) ===
+.obsidian/workspace*
+.obsidian/cache

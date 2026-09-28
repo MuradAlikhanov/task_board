@@ -1,0 +1,65 @@
+# ============================================================================
+# Task Board — Caddyfile (реверс-прокси + TLS + CORS/CSP для TMA)
+# См. ARCHITECTURE §3.1, §6.3 (CORS/CSP для Telegram Mini App).
+# ============================================================================
+
+{
+	# Глобальные опции
+	email admin@{$DOMAIN}
+}
+
+# Основной сайт: домен из переменной окружения DOMAIN.
+{$DOMAIN} {
+	# --- Заголовки CSP для Telegram Mini App (ARCHITECTURE §6.3) ---
+	# TMA открывается в iframe https://web.telegram.org — без frame-ancestors не отрендерится.
+	# X-Frame-Options не ставим: ALLOW-FROM не поддерживается современными браузерами,
+	# а DENY/SAMEORIGIN сломали бы TMA. CSP frame-ancestors достаточно.
+	header {
+		Content-Security-Policy "frame-ancestors https://web.telegram.org;"
+		# HSTS: max-age берётся из окружения. Для localhost/самоподписанных dev-сертификатов
+		# ставьте 0 (max-age=0 отменяет HSTS), иначе браузер навсегда запомнит домен
+		# как HTTPS-only. Для production — 31536000.
+		Strict-Transport-Security "max-age={$HSTS_MAX_AGE:31536000}; includeSubDomains"
+		# Не светим версию сервера
+		-Server
+	}
+
+	# --- API backend (FastAPI) ---
+	# /api/* и /docs, /redoc, /openapi.json — на backend:8000
+	@apis {
+		path /api/* /docs /redoc /openapi.json /api/v1/openapi.json
+	}
+	handle @apis {
+		reverse_proxy backend:8000
+	}
+
+	# --- Webhook Telegram-бота (ARCHITECTURE §3.3, §10 Q-A4) ---
+	@bot path /bot/*
+	handle @bot {
+		reverse_proxy backend:8000
+	}
+
+	# --- Health-проверки (используются Docker и внешним мониторингом) ---
+	@health path /healthz /ready
+	handle @health {
+		reverse_proxy backend:8000
+	}
+
+	# --- Frontend (Next.js: веб + TMA) — всё остальное ---
+	handle {
+		reverse_proxy frontend:3000
+	}
+
+	# Удобный лог доступа.
+	log {
+		output stdout
+		format console
+	}
+}
+
+# ----------------------------------------------------------------------------
+# Локальный HTTP (без TLS) — для dev на localhost:80 без валидного домена.
+# В проде DOMAIN = реальный домен, Caddy сам получит сертификат Let's Encrypt.
+# ----------------------------------------------------------------------------
+# Примечание: при DOMAIN=localhost Caddy использует внутренний CA (self-signed).
+# Для полностью HTTP-dev лучше переопределить Caddyfile в docker-compose.override.yml.

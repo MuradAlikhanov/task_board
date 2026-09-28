@@ -1,0 +1,28 @@
+# Dockerignore для backend
+__pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Секреты никогда не должны попадать в образ
+.env
+.env.*
+
+# Тесты и IDE не нужны в образе
+tests/
+.vscode/
+.idea/
+
+# Vault и БД монтируются снаружи
+vault/
+*.sqlite
+*.sqlite-*

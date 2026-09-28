@@ -1,0 +1,68 @@
+# ============================================================================
+# Task Board — дефолтная схема (config.yml)
+# См. VAULT_EXAMPLES.md §3.1, DATA_MODEL §3.9.
+# Здесь хранится ТОЛЬКО схема: статусы, приоритеты, определения custom-полей.
+# Проекты/клиенты/контакты — wiki-страницы (см. VAULT_EXAMPLES §3.2).
+# ============================================================================
+
+# Статусы заявок (гибкие — добавляются/удаляются через UI, ARCHITECTURE §10 Q-A1, VISION §4.2)
+statuses:
+  - name: Backlog
+    type: initial          # категория: initial | progress | final | on_hold | archive
+    color: "#9e9e9e"       # цвет рамки/бейджа статуса
+    on_board: true         # показывать на канбане
+    order: 1
+  - name: To Do
+    type: initial
+    color: "#2196f3"
+    on_board: true
+    order: 2
+  - name: In Progress
+    type: progress
+    color: "#ff9800"
+    on_board: true
+    order: 3
+  - name: Review/Testing
+    type: progress
+    color: "#9c27b0"
+    on_board: true
+    order: 4
+  - name: Done
+    type: final
+    color: "#4caf50"
+    on_board: true         # Done ВИДЕН на доске (VISION §4.2)
+    system: true           # системный — защищён от удаления
+    order: 5
+  - name: On Hold
+    type: on_hold
+    color: "#607d8b"
+    on_board: true
+    order: 6
+  - name: Archived
+    type: archive
+    color: "#bdbdbd"
+    on_board: false        # архив НЕ показывается на доске (VISION §4.1.1)
+    system: true
+    order: 7
+
+# Приоритеты (VISION §4.4)
+priorities:
+  - { name: Critical, color: "#f44336", order: 1 }
+  - { name: High,     color: "#ff9800", order: 2 }
+  - { name: Medium,   color: "#2196f3", order: 3 }
+  - { name: Low,      color: "#9e9e9e", order: 4 }
+
+# Пользовательские атрибуты заявок (custom fields, VISION §4.5)
+# Примеры полей для финотчётов/сверки с заказчиком.
+custom_fields:
+  - key: client_ticket_number
+    label: "Номер заявки заказчика"
+    type: text
+    required: false
+  - key: client_ticket_date
+    label: "Дата заявки заказчика"
+    type: date
+    required: false
+
+# Проекты, клиенты, контакты ЗДЕСЬ НЕ ХРАНЯТСЯ — они wiki-страницы
+# (см. vault/wiki/projects|clients|contacts/, VAULT_EXAMPLES.md §3.2).
