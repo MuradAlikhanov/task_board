@@ -29,9 +29,8 @@
 
 ### Требования
 - Docker и Docker Compose.
-- Node.js 20+ — один раз, для фиксации зависимостей фронтенда: `cd frontend && npm install`
-  и закоммитить `package-lock.json` (Dockerfile автоматически переключится на `npm ci` —
-  воспроизводимые сборки).
+- Node.js 24+ — только для локальной разработки фронтенда (`npm run dev`). Docker собирает
+  фронтенд по закоммиченному `package-lock.json` (`npm ci`).
 
 ### Запуск
 ```bash
@@ -70,7 +69,7 @@ SQLite-индекс лежит вне vault, в `db/index.sqlite` (создаё�
 | Слой | Технология |
 |------|------------|
 | Backend | FastAPI (Python 3.14) + aiogram 3.x |
-| Frontend | Next.js 14 (App Router, React 18) |
+| Frontend | Next.js 16 (App Router, React 19) |
 | БД/индекс | SQLite (WAL) + FTS5 + sqlite-vec |
 | Proxy/TLS | Caddy 2 |
 | Контейнеры | Docker / Docker Compose |

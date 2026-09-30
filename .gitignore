@@ -46,6 +46,8 @@ htmlcov/
 # === Node / Next.js ===
 node_modules/
 .next/
+# Генерируется Next 16 (ссылается на .next/types, меняется между dev и build).
+next-env.d.ts
 out/
 build/
 dist/

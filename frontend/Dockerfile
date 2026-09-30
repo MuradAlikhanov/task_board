@@ -1,20 +1,18 @@
 # syntax=docker/dockerfile:1
-# === Task Board frontend: Next.js 14 (App Router) ===
-# Node.js 20 LTS (план этапа 1). Multi-stage: deps → build → runner.
+# === Task Board frontend: Next.js 16 (App Router) ===
+# Node.js 24 LTS (поддержка до 30.04.2028). Multi-stage: deps → build → runner.
 # output: "standalone" (next.config.js) — в runner копируем только
 # .next/standalone + .next/static + public (~80 МБ вместо ~400 МБ node_modules).
 
 # --- deps: установка зависимостей ---
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /app
-COPY package.json package-lock.json* ./
-# npm ci — строго по lockfile (воспроизводимые сборки). Пока lockfile не
-# закоммичен — fallback на npm install (сгенерируйте: npm install && закоммитить
-# package-lock.json, после чего эта ветка перестанет использоваться).
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+COPY package.json package-lock.json ./
+# npm ci — строго по lockfile (воспроизводимые сборки).
+RUN npm ci
 
 # --- build: сборка production-артефакта ---
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -27,7 +25,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # --- runner: минимальный образ для запуска ---
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

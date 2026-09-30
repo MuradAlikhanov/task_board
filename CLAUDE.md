@@ -17,7 +17,7 @@ Code comments, docstrings, docs and user-facing strings are in Russian; follow t
 
 ## Commands
 
-No test suite, linter config, or `package-lock.json` exists yet.
+No test suite exists yet. The frontend has ESLint (flat config, `frontend/eslint.config.mjs`) and a committed `package-lock.json`.
 
 ```bash
 # Full stack (Caddy proxy + backend + frontend)
@@ -32,7 +32,7 @@ curl -k https://localhost/ready      # readiness: vault dir exists + index opens
 docker compose exec backend python -m app.cli --help
 docker compose exec backend python -m app.cli init-admin --telegram @user --name "Имя"
 
-# Frontend (Next.js 14 App Router)
+# Frontend (Next.js 16 App Router, Node 24)
 cd frontend && npm install && npm run dev    # :3000; also: npm run build, npm run lint
 ```
 
@@ -73,4 +73,4 @@ Three containers (`docker-compose.yml`): **Caddy** (`proxy/Caddyfile`) routes `/
 REST under `/api/v1`. Auth is Bearer JWT (Telegram Login for web, `initData` for the Mini App) or `X-API-Key` for AI agents. Errors use the shape `{"error": {"code", "message", "details"}}`. Pagination is `?page=&size=` (default 50) and sorting is `?sort=field,asc|desc`. Mutations accept an `Idempotency-Key` header.
 
 ### Frontend
-Next.js 14 App Router, one codebase for web and Telegram Mini App. `NEXT_PUBLIC_API_URL` (default `/api/v1`) is inlined at **build time** via the Docker build arg, so changing it requires a rebuild. `output: "standalone"` is required by the frontend Dockerfile.
+Next.js 16 App Router (React 19), one codebase for web and Telegram Mini App. `NEXT_PUBLIC_API_URL` (default `/api/v1`) is inlined at **build time** via the Docker build arg, so changing it requires a rebuild. `output: "standalone"` is required by the frontend Dockerfile.

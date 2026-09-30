@@ -2,24 +2,27 @@
   "name": "taskboard-frontend",
   "version": "0.1.0",
   "private": true,
-  "description": "Task Board — веб + Telegram Mini App (Next.js 14, App Router)",
+  "description": "Task Board — веб + Telegram Mini App (Next.js 16, App Router)",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
-    "next": "14.1.4",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@types/node": "20.11.30",
-    "@types/react": "18.2.73",
-    "@types/react-dom": "18.2.22",
-    "eslint": "8.57.0",
-    "eslint-config-next": "14.1.4",
-    "typescript": "5.4.3"
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.8",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
