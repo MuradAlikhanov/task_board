@@ -41,4 +41,9 @@ USER appuser
 EXPOSE 8000
 
 # Запуск через uvicorn. Для dev добавить --reload можно через override compose.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# За Caddy: доверяем X-Forwarded-Proto/For, иначе редиректы уходят на http://,
+# а в логах IP прокси вместо клиента. "*" безопасно: порт 8000 только expose'нут
+# во внутреннюю сеть compose, снаружи до uvicorn не достучаться.
+# Exec-форма без shell — значение пишется без кавычек, иначе они уйдут в uvicorn.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", \
+     "--proxy-headers", "--forwarded-allow-ips=*"]
