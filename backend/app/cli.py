@@ -17,6 +17,7 @@ import typer
 import structlog
 
 from app.config import get_settings
+from app.log_config import setup_logging
 
 app = typer.Typer(add_completion=False, help="Task Board admin CLI")
 log = structlog.get_logger()
@@ -61,4 +62,5 @@ def cleanup_orphans(
 
 
 if __name__ == "__main__":
+    setup_logging(get_settings())
     app()

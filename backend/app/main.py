@@ -25,6 +25,7 @@ from app.bot import bot as bot_module
 from app.db.connection import init_db
 from app.events.bus import get_event_bus
 from app.indexer.watcher import start_watcher, stop_watcher
+from app.log_config import setup_logging
 
 log = structlog.get_logger()
 
@@ -75,6 +76,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 def create_app() -> FastAPI:
     """Фабрика приложения."""
     settings = get_settings()
+    setup_logging(settings)
 
     app = FastAPI(
         title="Task Board API",
