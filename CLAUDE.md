@@ -36,7 +36,7 @@ docker compose exec backend python -m app.cli init-admin --telegram @user --name
 cd frontend && npm install && npm run dev    # :3000; also: npm run build, npm run lint
 ```
 
-Running the backend locally without Docker: dependencies are installed into `.deps/` (pip `--target`, Python 3.14, newer versions than the pins in `backend/requirements.txt`, which the Python 3.12 Docker image uses). `.venv/` is an empty venv used only for the interpreter:
+Running the backend locally without Docker: dependencies are installed into `.deps/` (pip `--target` from `backend/requirements.txt`, Python 3.14 — same interpreter and pins as the Docker image). `.venv/` is an empty venv used only for the interpreter:
 
 ```bash
 cd backend

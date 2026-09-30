@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 # === Task Board backend: FastAPI + aiogram (один контейнер, Q-A1) ===
-# Python 3.12 (план этапа 1). Multi-stage: builder (компиляция зависимостей)
+# Python 3.14 (как в requirements.txt). Multi-stage: builder (компиляция зависимостей)
 # → runtime (чистый slim без build-essential).
 
 # --- builder: установка зависимостей в отдельный prefix ---
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 # Инструменты сборки — только на случай пакетов без prebuilt wheel
 # (sqlite-vec обычно ставится готовым wheel'ом).
@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # --- runtime: чистый образ ---
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 

@@ -69,7 +69,7 @@ SQLite-индекс лежит вне vault, в `db/index.sqlite` (создаё�
 
 | Слой | Технология |
 |------|------------|
-| Backend | FastAPI (Python 3.12) + aiogram 3.x |
+| Backend | FastAPI (Python 3.14) + aiogram 3.x |
 | Frontend | Next.js 14 (App Router, React 18) |
 | БД/индекс | SQLite (WAL) + FTS5 + sqlite-vec |
 | Proxy/TLS | Caddy 2 |
