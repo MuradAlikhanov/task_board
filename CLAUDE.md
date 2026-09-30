@@ -40,18 +40,18 @@ Running the backend locally without Docker: dependencies are installed into `.de
 
 ```bash
 cd backend
-PYTHONPATH=../.deps VAULT_PATH=../vault DB_PATH=../vault/.taskboard/index.sqlite \
+PYTHONPATH=../.deps VAULT_PATH=../vault DB_PATH=../db/index.sqlite \
   ../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
 ```
 
-`Settings` reads `.env` relative to the current working directory, so from `backend/` the root `.env` isn't picked up — pass env vars explicitly. Defaults point at `/app/vault` (container paths).
+`Settings` reads `.env` relative to the current working directory, so from `backend/` the root `.env` isn't picked up — pass env vars explicitly. Defaults point at `/app/vault` and `/app/db` (container paths).
 
 ## Architecture
 
 Three containers (`docker-compose.yml`): **Caddy** (`proxy/Caddyfile`) routes `/api/*`, `/docs`, `/redoc`, `/openapi.json`, `/bot/*`, `/healthz`, `/ready` to `backend:8000` and everything else to `frontend:3000`. It also sets CSP `frame-ancestors https://web.telegram.org` so the Telegram Mini App can render in an iframe; don't add `X-Frame-Options` (ARCHITECTURE §6.3). Frontend and backend ports are only `expose`d, so everything goes through Caddy on 80/443.
 
 ### Core invariant: vault files are the source of truth
-- All data lives as Markdown + YAML frontmatter in `vault/` (edited in Obsidian and synced via Syncthing). `vault/.taskboard/index.sqlite` is a **derived** index that can always be rebuilt from the files. Never write to SQLite bypassing the files.
+- All data lives as Markdown + YAML frontmatter in `vault/` (edited in Obsidian and synced via Syncthing). `db/index.sqlite` (outside the vault, so Syncthing doesn't sync it) is a **derived** index that can always be rebuilt from the files. Never write to SQLite bypassing the files.
 - Reads go to SQLite. Writes serialize to `.md` → the watchdog watcher (`app/indexer/watcher.py`) picks up the change → reindexes. Echo-loop protection (ARCHITECTURE §4) is two-layer: an in-memory own-write set with ~1–2s TTL, plus `etag` comparison.
 - `vault/.taskboard/config.yml` holds only the schema (statuses, priorities, custom fields). Projects, clients and contacts are wiki pages under `vault/wiki/*/`, not config.
 - Tasks whose status has type `archive` are moved from `tasks/` to `archive/`.

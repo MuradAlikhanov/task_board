@@ -27,9 +27,9 @@ COPY --from=builder /install /usr/local
 # Код приложения.
 COPY app/ ./app/
 
-# Vault монтируется как volume (см. docker-compose.yml), поэтому его НЕ копируем.
-# Создаём точку монтирования, чтобы при старте каталог существовал.
-RUN mkdir -p /app/vault \
+# Vault и каталог индекса монтируются как volumes (см. docker-compose.yml),
+# поэтому их НЕ копируем. Создаём точки монтирования, чтобы каталоги существовали.
+RUN mkdir -p /app/vault /app/db \
     && useradd --system --create-home appuser \
     && chown -R appuser:appuser /app
 

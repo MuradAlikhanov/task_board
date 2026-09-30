@@ -113,7 +113,7 @@ backend/app/
 
 ### 3.4 Vault + SQLite-индекс (+ векторы)
 - **Vault** (`/vault`): `.md`-файлы + `attachments/` — источник правды.
-- **SQLite-индекс** (`.taskboard/index.sqlite`): таблицы заявок, контактов, проектов, **FTS5** для текстового поиска и **векторная таблица (sqlite-vec)** для семантического поиска.
+- **SQLite-индекс** (`db/index.sqlite`, вне vault — §7): таблицы заявок, контактов, проектов, **FTS5** для текстового поиска и **векторная таблица (sqlite-vec)** для семантического поиска.
 - **Embedding**: считается через **Gemini API** при индексации wiki-страниц (помеченных `rag: true`, §6.1) и при поисковом запросе. Векторы (768-dim) хранятся в той же `index.sqlite`.
 - Состав индекса пересобирается при изменении wiki; потеря index.sqlite не страшна (пересобирается из vault + Gemini).
 
@@ -255,7 +255,7 @@ Telegram Mini App открывается внутри WebView/iframe мессе�
 
 **Volumes:**
 - `vault/` — монтируется в `backend` (и в `syncthing`).
-- `db/` — SQLite-индекс (включая FTS5 и векторы sqlite-vec).
+- `db/` — SQLite-индекс (включая FTS5 и векторы sqlite-vec). Вне vault: иначе Syncthing синхронизирует его при каждой записи и копирует основной файл и `-wal` порознь.
 
 **Health checks:** эндпоинты `/healthz` и `/ready` (проверка vault доступен, SQLite открывается, бот API отвечает) в FastAPI; интеграция с Docker HEALTHCHECK.
 

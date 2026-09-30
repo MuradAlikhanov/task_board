@@ -32,8 +32,8 @@ class Settings(BaseSettings):
     # === Пути ===
     vault_path: Path = Field(default=Path("/app/vault"), description="Путь к vault")
     db_path: Path = Field(
-        default=Path("/app/vault/.taskboard/index.sqlite"),
-        description="Путь к SQLite-индексу",
+        default=Path("/app/db/index.sqlite"),
+        description="Путь к SQLite-индексу (вне vault, ARCHITECTURE §7)",
     )
 
     # === Авторизация (этап 2) ===

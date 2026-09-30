@@ -17,8 +17,13 @@ vault/wiki/*
 !vault/wiki/*/
 vault/wiki/*/*
 !vault/wiki/*/.gitkeep
+# Прежнее расположение индекса (до переноса в db/) — на случай старых файлов.
 vault/.taskboard/index.sqlite
 vault/.taskboard/index.sqlite-*
+
+# === SQLite-индекс (производный, пересобирается из vault) ===
+db/*
+!db/.gitkeep
 
 # === Python ===
 __pycache__/

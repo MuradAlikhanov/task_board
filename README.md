@@ -58,7 +58,8 @@ curl -k https://localhost/ready     # readiness (vault доступен, SQLite-
 - `wiki/projects|clients|contacts|regulations|knowledge/` — справочники и база знаний.
 - `wiki/_secret/` — не индексируется в RAG (ARCHITECTURE §6.1).
 - `.taskboard/config.yml` — дефолтная схема (статусы, приоритеты).
-- `.taskboard/index.sqlite` — SQLite-индекс (создаётся при первом запуске).
+
+SQLite-индекс лежит вне vault, в `db/index.sqlite` (создаётся при первом запуске, пересобирается из файлов): Syncthing его не синхронизирует.
 
 > Vault синхронизируется с локальным Obsidian через Syncthing (см. VISION §9, ARCHITECTURE §7).
 

@@ -47,12 +47,15 @@ services:
       # Явные переопределения для контейнера (на случай отсутствия в .env).
       - APP_ENV=${APP_ENV:-development}
       - VAULT_PATH=/app/vault
-      - DB_PATH=/app/vault/.taskboard/index.sqlite
+      - DB_PATH=/app/db/index.sqlite
     volumes:
       # Vault — источник правды (см. ARCHITECTURE §4, DATA_MODEL §1).
-      # SQLite-индекс живёт ВНУТРИ vault/.taskboard/ (DATA_MODEL §3),
-      # поэтому отдельный volume не нужен — индекс rides на vault-маунте.
       - ./vault:/app/vault
+      # SQLite-индекс — ВНЕ vault (ARCHITECTURE §7): иначе Syncthing гоняет его
+      # по устройствам при каждой записи и копирует основной файл и -wal порознь.
+      # Bind-mount, а не именованный volume: тот создаётся от root, и процесс
+      # с user: UID:GID не смог бы в него писать.
+      - ./db:/app/db
     networks:
       - taskboard-net
     expose:

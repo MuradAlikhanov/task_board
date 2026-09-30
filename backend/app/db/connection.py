@@ -18,7 +18,7 @@ log = structlog.get_logger()
 
 
 def ensure_dirs(db_path: Path | None = None) -> Path:
-    """Создаёт каталоги для БД (vault/.taskboard/). Вызывается один раз при старте
+    """Создаёт каталог для БД (db/, вне vault). Вызывается один раз при старте
     (lifespan) — connect() не должен мутировать файловую систему (readiness-проверки).
     """
     settings: Settings = get_settings()
@@ -94,7 +94,7 @@ def check_db_ready() -> bool:
     """Readiness-проверка: БД открывается и отвечает на простой запрос.
 
     Используется в /ready (ARCHITECTURE §7). Открывает БД только на чтение и без
-    sqlite-vec: проверка не создаёт index.sqlite (и -wal/-shm) в vault, если его нет, —
+    sqlite-vec: проверка не создаёт index.sqlite (и -wal/-shm), если его нет, —
     отсутствующий индекс означает «не готов». Блокирующая — вызывать из threadpool.
     """
     path = get_settings().db_path

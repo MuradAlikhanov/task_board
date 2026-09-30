@@ -21,7 +21,7 @@ from app.config import Settings
 log = structlog.get_logger()
 
 # Каталоги/паттерны, которые не относятся к заметкам vault:
-# - .taskboard/ — служебный (index.sqlite и пр.);
+# - .taskboard/ — служебный (config.yml);
 # - *.sync-conflict-*, .syncthing* — артефакты Syncthing;
 # - .stfolder/.stignore — маркеры Syncthing;
 # - *.tmp, ~* — временные файлы редакторов и атомарных записей.
